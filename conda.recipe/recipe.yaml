@@ -35,3 +35,10 @@ tests:
 - python:
       imports:
         - surfa
+
+about:
+  homepage: https://github.com/freesurfer/surfa
+  license: MIT
+  description: Python utilities for medical image and surface-based analysis
+  repository: https://github.com/freesurfer/surfa
+  documentation: https://surfer.nmr.mgh.harvard.edu/docs/surfa/
