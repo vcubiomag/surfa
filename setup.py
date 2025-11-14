@@ -2,49 +2,13 @@
 
 import re
 import pathlib
-
-from setuptools import setup
-from setuptools import dist
-from setuptools.extension import Extension
-
-
-requirements = [
-    'numpy',
-    'scipy',
-    'nibabel>=2.1',
-    'Pillow',
-    'xxhash',
-]
-
-packages = [
-    'surfa',
-    'surfa.core',
-    'surfa.transform',
-    'surfa.image',
-    'surfa.mesh',
-    'surfa.io',
-    'surfa.vis',
-]
-
-# base source directory
-base_dir = pathlib.Path(__file__).parent.resolve()
-
-# configure c extensions
-ext_opts = dict(extra_compile_args=['-O3', '-std=c99'])
-extensions = [
-    Extension('surfa.image.interp', [f'surfa/image/interp.pyx'], **ext_opts),
-    Extension('surfa.mesh.intersection', [f'surfa/mesh/intersection.pyx'], **ext_opts),
-]
-
+from setuptools import setup, Extension
 from Cython.Build import cythonize
-extensions = cythonize(extensions, compiler_directives={'language_level' : '3'})
-
-# since we interface the c stuff with numpy, it's another hard
-# requirement at build-time
 import numpy as np
-include_dirs = [np.get_include()]
 
-# extract the current version
+# --- Version Reading Logic (Dynamic) ---
+# This is needed because 'version' is marked as 'dynamic' in pyproject.toml
+base_dir = pathlib.Path(__file__).parent.resolve()
 init_file = base_dir.joinpath('surfa/__init__.py')
 init_text = open(init_file, 'rt').read()
 pattern = r"^__version__ = ['\"]([^'\"]*)['\"]"
@@ -53,33 +17,24 @@ if not match:
     raise RuntimeError(f'Unable to find __version__ in {init_file}.')
 version = match.group(1)
 
-long_description = '''Surfa is a collection of Python utilities for medical image
-analysis and mesh-based surface processing. It provides tools that operate on 3D image
-arrays and triangular meshes with consideration of their representation in a world (or
-scanner) coordinate system. While broad in scope, surfa is developed with particular
-emphasis on neuroimaging applications.
-'''
 
-# run setup
+# --- Cython Extension Logic (Dynamic) ---
+# This build logic cannot be expressed in pyproject.toml
+ext_opts = dict(extra_compile_args=['-O3', '-std=c99'])
+extensions = [
+    Extension('surfa.image.interp', [f'surfa/image/interp.pyx'], **ext_opts),
+    Extension('surfa.mesh.intersection', [f'surfa/mesh/intersection.pyx'], **ext_opts),
+]
+
+extensions = cythonize(extensions, compiler_directives={'language_level' : '3'})
+include_dirs = [np.get_include()]
+
+
+# --- Minimal Setup Call ---
+# All static metadata (name, description, classifiers, etc.)
+# has been moved to pyproject.toml.
 setup(
-    name='surfa',
     version=version,
-    license='MIT',
-    description='Utilities for medical image and surface processing.',
-    long_description=long_description,
-    author='Andrew Hoopes',
-    author_email='freesurfer@nmr.mgh.harvard.edu',
-    url='https://github.com/freesurfer/surfa',
-    python_requires='>=3.6',
-    packages=packages,
     ext_modules=extensions,
     include_dirs=include_dirs,
-    package_data={'': ['*.pyx'], '': ['*.h']},
-    install_requires=requirements,
-    classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Programming Language :: Python :: 3',
-        'Natural Language :: English',
-        'Topic :: Scientific/Engineering',
-    ],
 )

@@ -1,2 +1,50 @@
 [build-system]
-requires = ['setuptools', 'wheel', 'Cython>=3.0', 'numpy']
+build-backend = "setuptools.build_meta"
+requires = [
+    'setuptools',
+    'wheel',
+    'cython',
+    'numpy>=2.0.0',
+]
+
+[project]
+name = "surfa"
+dynamic = ["version"]
+description = "Python utilities for medical image and surface-based analysis"
+readme = "readme.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [
+  { name = "Andrew Hoopes", email = "freesurfer@nmr.mgh.harvard.edu" }
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Natural Language :: English",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "numpy>=1.26.4",
+    "scipy",
+    "nibabel>=2.1",
+    "Pillow",
+    "xxhash",
+]
+
+[project.urls]
+Homepage = "https://github.com/freesurfer/surfa"
+Repository = "https://github.com/freesurfer/surfa"
+
+[tool.setuptools]
+packages = [
+    "surfa",
+    "surfa.core",
+    "surfa.transform",
+    "surfa.image",
+    "surfa.mesh",
+    "surfa.io",
+    "surfa.vis",
+]
+
+[tool.setuptools.package-data]
+"*" = ["*.pyx", "*.h"]
