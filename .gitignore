@@ -13,3 +13,5 @@ surfa.egg-info
 docs/.deps
 docs/build
 docs/reference/api
+
+output
